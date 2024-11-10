@@ -5,6 +5,9 @@ require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 3000
 
+app.use(express.json());
+
+
 // Function to generate a unique transaction ID
 function generatedTranscId() {
     return 'T' + Date.now();
@@ -123,6 +126,32 @@ app.get('/rideInfo', (req, res) => {
             waitingTime: rideInfo.waitingTime
         }
     });
+});
+
+function updateWaitingTime(rideName, newWaitingTime) {
+    if (!rideData[rideName.toLowerCase()]) {
+        throw new Error("Ride not found");
+    }
+    rideData[rideName.toLowerCase()].waitingTime = newWaitingTime;
+}
+
+app.patch('/rideInfo', (req, res) => {
+    try {
+        console.log('body',req.body)
+        const rideName = req.body.rideName;
+        const newWaitingTime = req.body.waitingTime;
+        updateWaitingTime(rideName, newWaitingTime);
+        res.status(200).json({
+            status: "success",
+            data: {
+                rideName: rideName,
+                queueLength: rideData[rideName.toLowerCase()].queueLength,
+                waitingTime: newWaitingTime
+            }
+        });
+    } catch (error) {
+        res.status(404).json({ msg: error.message, status: "error" });
+    }
 });
 
 app.listen(port, ()=> {
