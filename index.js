@@ -1,6 +1,7 @@
 const express = require('express');
 const CryptoJS = require('crypto-js')
 const axios = require('axios')
+const cors = require('cors')
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 3000
